@@ -1,7 +1,6 @@
 import gradio as gr
 import subprocess
 import os
-import shutil
 
 MODELS_MAPPING = {
     'English': 'en_US-lessac-medium',
