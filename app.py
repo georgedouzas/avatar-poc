@@ -9,16 +9,12 @@ MODELS_MAPPING = {
 }
 
 
-def generate_video(language, text, image):
+def generate_video(language, text, image_path):
 
     language_model = MODELS_MAPPING.get(language, 'en_US-lessac-medium')
 
     # Set paths
     driven_audio_path = 'examples/driven_audio/input_audio.wav'
-    source_image_path = 'examples/source_image/input_image.png'
-
-    # Save uploaded image to source path
-    shutil.copy(image, source_image_path)
 
     # Run TTS to generate audio
     subprocess.run([
@@ -32,18 +28,28 @@ def generate_video(language, text, image):
     subprocess.run([
         'python3.8', 'inference.py',
         '--driven_audio', driven_audio_path,
-        '--source_image', source_image_path,
+        '--source_image', image_path,
         '--result_dir', './results'
     ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # Construct expected output filename (latest .mp4 in results/)
     result_subdirs = sorted(os.listdir('./results'), reverse=True)
     for subdir in result_subdirs:
-        path = os.path.join('./results', subdir, 'input_image##output.mp4')
-        if os.path.exists(path):
-            return path
+        for video_path in os.listdir(os.path.join('./results', subdir)):
+            if video_path.endswith('.mp4'):
+                return video_path
 
     return "Error: No output video generated."
+
+
+def get_image_choices():
+    """List all .png and .jpg files in examples/source_image"""
+    image_dir = "examples/source_image"
+    return sorted([
+        os.path.join(image_dir, f)
+        for f in os.listdir(image_dir)
+        if f.lower().endswith((".png", ".jpg", ".jpeg"))
+    ])
 
 
 def launch():
@@ -51,9 +57,9 @@ def launch():
         gr.Markdown("# Avatar PoC")
 
         with gr.Row():
-            language_input = gr.Dropdown(choices=list(MODELS_MAPPING.keys()), label="Select Language", value="English")
-            text_input = gr.Textbox(lines=4, label="Enter Text")
-            image_input = gr.Image(label="Upload Image", type="filepath")
+            language = gr.Dropdown(choices=list(MODELS_MAPPING.keys()), label="Select Language", value="English")
+            text = gr.Textbox(lines=4, label="Enter Text")
+            image_path = gr.Dropdown(choices=get_image_choices(), label="Select Image")
 
         generate_button = gr.Button("Generate Video")
 
@@ -61,7 +67,7 @@ def launch():
 
         generate_button.click(
             fn=generate_video,
-            inputs=[language_input, text_input, image_input],
+            inputs=[language, text, image_path],
             outputs=video_output
         )
 
