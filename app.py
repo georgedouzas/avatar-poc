@@ -32,23 +32,17 @@ def generate_video(language, text, image_path):
     ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # Construct expected output filename (latest .mp4 in results/)
-    result_subdirs = sorted(os.listdir('./results'), reverse=True)
-    for subdir in result_subdirs:
-        for video_path in os.listdir(os.path.join('./results', subdir)):
-            if video_path.endswith('.mp4'):
-                return video_path
-
-    return "Error: No output video generated."
+    results_path = sorted(os.listdir('./results'), reverse=True)
+    return max([os.path.join('./results', path) for path in results_path], key=os.path.getctime)
 
 
 def get_image_choices():
-    """List all .png and .jpg files in examples/source_image"""
     image_dir = "examples/source_image"
-    return sorted([
+    return [
         os.path.join(image_dir, f)
-        for f in os.listdir(image_dir)
+        for f in sorted(os.listdir(image_dir))
         if f.lower().endswith((".png", ".jpg", ".jpeg"))
-    ])
+    ]
 
 
 def launch():
@@ -58,7 +52,14 @@ def launch():
         with gr.Row():
             language = gr.Dropdown(choices=list(MODELS_MAPPING.keys()), label="Select Language", value="English")
             text = gr.Textbox(lines=4, label="Enter Text")
-            image_path = gr.Dropdown(choices=get_image_choices(), label="Select Image")
+        
+        gr.Markdown("### Select an Image")
+        image_path = gr.Radio(
+            choices=get_image_choices(),
+            label="Click an image path"
+        )
+        image_preview = gr.Image(type="filepath", label="Preview of Selected Image")
+        image_path.change(fn=lambda x: x, inputs=image_path, outputs=image_preview)
 
         generate_button = gr.Button("Generate Video")
 
