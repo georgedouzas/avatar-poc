@@ -66,15 +66,24 @@ def launch():
             next_btn = gr.Button("Next ➡️")
 
         with gr.Row():
-            image_display = gr.Image(type="filepath", label="Image Preview", height=300, width=300)
+            image_display = gr.Image(type="filepath", label="Image Preview", height=300, width=300, value=IMAGE_CHOICES[0])
         
         image_index = gr.State(0)
 
-        prev_btn.click(fn=change_image, inputs=[image_index, gr.Number(-1)], outputs=[image_display, image_index])
-        next_btn.click(fn=change_image, inputs=[image_index, gr.Number(1)], outputs=[image_display, image_index])
+        prev_btn.click(
+            fn=lambda idx: change_image(idx, -1),
+            inputs=image_index,
+            outputs=[image_display, image_index]
+        )
+
+        next_btn.click(
+            fn=lambda idx: change_image(idx, 1),
+            inputs=image_index,
+            outputs=[image_display, image_index]
+        )
 
         generate_button = gr.Button("Generate Video")
-        video_output = gr.Video(label="Generated Video", height=300)
+        video_output = gr.Video(label="Generated Video", height=400)
 
         generate_button.click(
             fn=lambda lang, txt, idx: generate_video(lang, txt, IMAGE_CHOICES[idx]),
