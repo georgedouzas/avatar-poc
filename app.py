@@ -6,6 +6,12 @@ MODELS_MAPPING = {
     'English': 'en_US-lessac-medium',
     'Greek': 'el_GR-rapunzelina-low'
 }
+IMAGE_DIR = "examples/source_image"
+IMAGE_CHOICES = [
+    os.path.join(IMAGE_DIR, f)
+    for f in sorted(os.listdir(IMAGE_DIR))
+    if f.lower().endswith((".png", ".jpg", ".jpeg"))
+]
 
 
 def generate_video(language, text, image_path):
@@ -36,13 +42,13 @@ def generate_video(language, text, image_path):
     return max([os.path.join('./results', path) for path in results_path], key=os.path.getctime)
 
 
-def get_image_choices():
-    image_dir = "examples/source_image"
-    return [
-        os.path.join(image_dir, f)
-        for f in sorted(os.listdir(image_dir))
-        if f.lower().endswith((".png", ".jpg", ".jpeg"))
-    ]
+def get_image(index):
+    return IMAGE_CHOICES[index], index
+
+
+def change_image(index, direction):
+    new_index = (index + direction) % len(IMAGE_CHOICES)
+    return get_image(new_index)
 
 
 def launch():
@@ -54,20 +60,25 @@ def launch():
             text = gr.Textbox(lines=4, label="Enter Text")
         
         gr.Markdown("### Select an Image")
-        image_path = gr.Radio(
-            choices=get_image_choices(),
-            label="Click an image path"
-        )
-        image_preview = gr.Image(type="filepath", label="Preview of Selected Image")
-        image_path.change(fn=lambda x: x, inputs=image_path, outputs=image_preview)
+
+        with gr.Row():
+            prev_btn = gr.Button("⬅️ Previous")
+            next_btn = gr.Button("Next ➡️")
+
+        with gr.Row():
+            image_display = gr.Image(type="filepath", label="Image Preview", height=128, width=128)
+        
+        image_index = gr.State(0)
+
+        prev_btn.click(fn=change_image, inputs=[image_index, gr.Number(-1)], outputs=[image_display, image_index])
+        next_btn.click(fn=change_image, inputs=[image_index, gr.Number(1)], outputs=[image_display, image_index])
 
         generate_button = gr.Button("Generate Video")
-
-        video_output = gr.Video(label="Generated Video")
+        video_output = gr.Video(label="Generated Video", height=240)
 
         generate_button.click(
-            fn=generate_video,
-            inputs=[language, text, image_path],
+            fn=lambda lang, txt, idx: generate_video(lang, txt, IMAGE_CHOICES[idx]),
+            inputs=[language, text, image_index],
             outputs=video_output
         )
 
