@@ -66,7 +66,7 @@ def launch():
             next_btn = gr.Button("Next ➡️")
 
         with gr.Row():
-            image_display = gr.Image(type="filepath", label="Image Preview", height=128, width=128)
+            image_display = gr.Image(type="filepath", label="Image Preview", height=300, width=300)
         
         image_index = gr.State(0)
 
@@ -74,7 +74,7 @@ def launch():
         next_btn.click(fn=change_image, inputs=[image_index, gr.Number(1)], outputs=[image_display, image_index])
 
         generate_button = gr.Button("Generate Video")
-        video_output = gr.Video(label="Generated Video", height=240)
+        video_output = gr.Video(label="Generated Video", height=300)
 
         generate_button.click(
             fn=lambda lang, txt, idx: generate_video(lang, txt, IMAGE_CHOICES[idx]),
