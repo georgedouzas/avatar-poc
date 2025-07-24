@@ -1,0 +1,10 @@
+Metadata-Version: 2.4
+Name: avatar-poc
+Version: 0.1.0
+Summary: Open-source implementation of interactive avatars.
+Author-email: Georgios Douzas <gdouzas@qualco.eu>
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: gradio>=5.38.1
+
+
