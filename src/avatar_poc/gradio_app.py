@@ -7,7 +7,7 @@ from avatar_poc.vidgen.sadtalker.main import generate_video
 
 IMAGE_CHOICES = [
     path
-    for path in (Path(__file__).parents[2] / 'avatars').iterdir()
+    for path in (Path(__file__).parent / 'avatars').iterdir()
     if path.suffix in (".png", ".jpg", ".jpeg")
 ]
 
