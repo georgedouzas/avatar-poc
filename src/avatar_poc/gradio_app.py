@@ -96,10 +96,10 @@ def launch():
             fn=check_ready, inputs=[text, selected_image_path], outputs=generate_button
         )
         generate_button.click(
-            fn=lambda lang, txt, img_path: generate(
-                lang, txt, audio_path, img_path, video_path
+            fn=lambda language, text, image_path: generate(
+                language, text, audio_path, image_path, video_path
             ),
-            inputs=[language, text, selected_image_path],
+            inputs=[language, text, selected_image_path.value],
             outputs=video_output,
         )
         text.change(

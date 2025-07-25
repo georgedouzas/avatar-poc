@@ -1,7 +1,4 @@
 import subprocess
-import os
-from tempfile import mkdtemp
-from pathlib import Path
 
 TTS_MODELS_MAPPING = {
     'English': 'en_US-lessac-medium',
