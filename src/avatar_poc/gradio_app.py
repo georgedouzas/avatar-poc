@@ -64,10 +64,7 @@ def launch():
         gallery = gr.Gallery(
             get_gallery_page(0), label='Avatar Gallery', columns=5, height='auto'
         )
-
-        # Events
         gallery_page_index = gr.State(0)
-        selected_image_path = gr.State(IMAGE_CHOICES[0])
         gallery_prev_btn.click(
             fn=lambda page: (
                 get_gallery_page(
@@ -88,8 +85,13 @@ def launch():
             inputs=gallery_page_index,
             outputs=[gallery, gallery_page_index],
         )
+
+        # Video generation
         generate_button = gr.Button('Generate Video', interactive=False)
         video_output = gr.Video(label='Generated Video', height=400)
+
+        # Events
+        selected_image_path = gr.State(IMAGE_CHOICES[0])
         gallery.select(fn=set_selected_image, outputs=[selected_image_path]).then(
             fn=check_ready, inputs=[text, selected_image_path], outputs=generate_button
         )
